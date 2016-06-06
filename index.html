@@ -37,8 +37,10 @@
         'https://www.googleapis.com/auth/youtube'
       ];
 
+      var authApiLoaded = false;
       var pickerApiLoaded = false;
       var oauthToken;
+      var viewIdForhandleAuthResult;
 
       // Use the API Loader script to load google.picker and gapi.auth.
       function onApiLoad() {
@@ -47,14 +49,7 @@
       }
 
       function onAuthApiLoad() {
-        window.gapi.auth.authorize(
-          {
-            'client_id': clientId,
-            'scope': scope,
-            'immediate': false
-          },
-          handleAuthResult
-        );
+        authApiLoaded = true;
       }
 
       function onPickerApiLoad() {
@@ -64,15 +59,16 @@
       function handleAuthResult(authResult) {
         if (authResult && !authResult.error) {
           oauthToken = authResult.access_token;
+          createPicker(viewIdForhandleAuthResult, true);
         }
       }
 
       // Create and render a Picker object for picking user Photos.
       function createPicker(viewId, setOAuthToken) {
-        if (pickerApiLoaded && oauthToken) {
+        if (authApiLoaded && pickerApiLoaded) {
           var picker;
           
-          if(setOAuthToken) {
+          if(authApiLoaded && oauthToken && setOAuthToken) {
             picker = new google.picker.PickerBuilder().
               addView(viewId).
               setOAuthToken(oauthToken).
@@ -95,9 +91,9 @@
       function pickerCallback(data) {
         var url = 'nothing';
         if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-          var doc = JSON.stringify(data[google.picker.Response.DOCUMENTS][0], null, "    ");
+          var doc = JSON.stringify(data[google.picker.Response.DOCUMENTS][0], null, "  ");
         }
-        var message = 'You picked: ' + doc;
+        var message = 'You picked: <br>' + doc;
         document.getElementById('result').innerHTML = message;
       }
     </script>
@@ -201,11 +197,25 @@
           var id = this.id;
           var viewId = viewIds[id];
           var setOAuthToken = true;
-          if (id === 'MAPS') {
-            setOAuthToken = false;
-          }
-          createPicker(viewId, setOAuthToken)
           
+          if (id === 'IMAGE_SEARCH' || id === 'MAPS' || id === 'VIDEO_SEARCH') {
+            setOAuthToken = false;
+            createPicker(viewId, setOAuthToken);
+          } else {
+            if(authApiLoaded && !oauthToken) {
+              viewIdForhandleAuthResult = viewId;
+              window.gapi.auth.authorize(
+                {
+                  'client_id': clientId,
+                  'scope': scope,
+                  'immediate': false
+                },
+                handleAuthResult
+              );
+            } else {
+              createPicker(viewId, setOAuthToken);
+            }
+          }
           return false;
         }
       });
