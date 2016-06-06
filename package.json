@@ -1,0 +1,24 @@
+{
+  "name": "google-picker-api-demo",
+  "version": "1.0.0",
+  "description": "google picker api demo https://developers.google.com/picker/",
+  "main": "index.js",
+  "dependencies": {
+    "live-server": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server --port=8080 --host=localhost"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/howdy39/google-picker-api-demo.git"
+  },
+  "author": "Tatsuya Nakano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/howdy39/google-picker-api-demo/issues"
+  },
+  "homepage": "https://github.com/howdy39/google-picker-api-demo#readme"
+}
